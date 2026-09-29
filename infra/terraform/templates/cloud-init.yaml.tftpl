@@ -1,0 +1,19 @@
+#cloud-config
+package_update: true
+packages:
+  - ca-certificates
+  - curl
+  - git
+
+output:
+  all: '| tee -a /var/log/cloud-init-output.log'
+
+runcmd:
+  - [bash, -lc, "snap install amazon-ssm-agent --classic || snap refresh amazon-ssm-agent"]
+  - [bash, -lc, "systemctl enable --now snap.amazon-ssm-agent.amazon-ssm-agent.service"]
+  - [bash, -lc, "curl -sfL https://get.k3s.io -o /tmp/install-k3s.sh"]
+  - [bash, -lc, "INSTALL_K3S_VERSION='${k3s_version}' INSTALL_K3S_EXEC='server --write-kubeconfig-mode 600' sh /tmp/install-k3s.sh"]
+  - [bash, -lc, "curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4 -o /tmp/get-helm.sh"]
+  - [bash, -lc, "chmod 700 /tmp/get-helm.sh && DESIRED_VERSION='${helm_version}' /tmp/get-helm.sh"]
+  - [bash, -lc, "until k3s kubectl get node >/dev/null 2>&1; do sleep 5; done"]
+  - [bash, -lc, "install -d -m 0755 /var/lib/gameops && touch /var/lib/gameops/bootstrap-complete"]

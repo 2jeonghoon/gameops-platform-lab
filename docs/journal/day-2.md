@@ -19,3 +19,5 @@ terraform -chdir=infra/terraform test
 Terraform 1.16.4와 AWS provider 6.62.0으로 구성 검증에 성공했다. mock provider 테스트 결과는 `1 passed, 0 failed`였다. 테스트는 서울 region, CIDR, 공개 IPv4, IGW 기본 경로, TCP 80 단일 공개 규칙, SSH 금지, USD 15 한도와 USD 5/10 알림을 확인한다.
 
 이 단계에서는 실제 AWS API를 호출하거나 유료 리소스를 만들지 않았다. 계정 ID, credential, 실제 알림 이메일도 기록하지 않았다.
+
+EC2·IAM·OIDC 구성도 mock provider로 추가 검증했다. `t3.medium`, Canonical Ubuntu 24.04 amd64, encrypted 20 GiB gp3, IMDSv2, SSM profile, SSH key 없음, 정확한 GitHub main subject와 네 가지 deploy action만 허용함을 테스트했다.
