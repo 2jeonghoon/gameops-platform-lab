@@ -22,6 +22,7 @@
 | kube-prometheus-stack chart | 91.8.0 | Prometheus, Grafana, Alertmanager, exporters |
 | Loki chart | 18.13.7 | 선택적 단일 바이너리 log storage |
 | Grafana Alloy chart | 1.13.0 | 선택적 Kubernetes Pod log 수집 |
+| k6 | 2.3.0 | 부하 profile inspect, archive, incident 실험 |
 | actions/checkout | 7.0.1 / `3d3c42e5aac5ba805825da76410c181273ba90b1` | CI |
 | actions/setup-python | 7.0.0 / `5fda3b95a4ea91299a34e894583c3862153e4b97` | CI |
 | hashicorp/setup-terraform | 4.0.1 / `dfe3c3f87815947d99a8997f908cb6525fc44e9e` | CI |

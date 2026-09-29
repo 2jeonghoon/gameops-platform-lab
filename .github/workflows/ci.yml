@@ -78,6 +78,12 @@ jobs:
           uv run pytest tests/monitoring -v
           shellcheck scripts/install_observability.sh scripts/deploy_on_instance.sh scripts/rollback.sh
 
+      - name: Validate load and incident experiments
+        run: |
+          uv run pytest tests/loadtest -v
+          bash scripts/validate_load_tests.sh
+          shellcheck scripts/inject_fault.sh scripts/validate_load_tests.sh
+
       - name: Validate Kubernetes schemas
         run: >-
           kubectl kustomize k8s/base |

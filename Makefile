@@ -1,4 +1,4 @@
-.PHONY: test lint format-check terraform-check kubernetes-check monitoring-check verify
+.PHONY: test lint format-check terraform-check kubernetes-check monitoring-check loadtest-check verify
 
 test:
 	uv run pytest
@@ -22,4 +22,9 @@ monitoring-check:
 	uv run pytest tests/monitoring -v
 	shellcheck scripts/install_observability.sh scripts/deploy_on_instance.sh scripts/rollback.sh
 
-verify: lint format-check test terraform-check kubernetes-check monitoring-check
+loadtest-check:
+	uv run pytest tests/loadtest -v
+	bash scripts/validate_load_tests.sh
+	shellcheck scripts/inject_fault.sh scripts/validate_load_tests.sh
+
+verify: lint format-check test terraform-check kubernetes-check monitoring-check loadtest-check
