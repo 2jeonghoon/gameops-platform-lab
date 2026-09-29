@@ -22,6 +22,12 @@ jobs:
           python-version: "3.12"
           check-latest: false
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.16.4
+          terraform_wrapper: false
+
       - name: Install uv
         run: python -m pip install --disable-pip-version-check uv==0.12.17
 

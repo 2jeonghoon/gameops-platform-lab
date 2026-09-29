@@ -12,7 +12,10 @@
 | Trivy | 0.74.0 | 컨테이너 취약점 검사 |
 | Gitleaks | 8.30.1 | Git 기록과 작업 트리 비밀 검사 |
 | actionlint | 1.7.12 | GitHub Actions 정적 검사 |
+| Terraform CLI | 1.16.4 | IaC 작성·검증·실행 |
+| AWS provider | 6.62.0 | `infra/terraform/.terraform.lock.hcl` |
 | actions/checkout | 7.0.1 / `3d3c42e5aac5ba805825da76410c181273ba90b1` | CI |
 | actions/setup-python | 7.0.0 / `5fda3b95a4ea91299a34e894583c3862153e4b97` | CI |
+| hashicorp/setup-terraform | 4.0.1 / `dfe3c3f87815947d99a8997f908cb6525fc44e9e` | CI |
 
 확인 근거는 각 프로젝트의 공식 릴리스와 `uv.lock`이다. GitHub Actions는 이동 가능한 major tag 대신 검토한 commit SHA를 사용한다.

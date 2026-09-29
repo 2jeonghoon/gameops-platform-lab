@@ -1,0 +1,4 @@
+aws_region        = "ap-northeast-2"
+project_name      = "gameops-platform-lab"
+environment       = "portfolio"
+budget_alert_email = "replace-me@example.com"

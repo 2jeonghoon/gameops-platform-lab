@@ -1,4 +1,4 @@
-.PHONY: test lint format-check verify
+.PHONY: test lint format-check terraform-check verify
 
 test:
 	uv run pytest
@@ -9,4 +9,9 @@ lint:
 format-check:
 	uv run ruff format --check app tests
 
-verify: lint format-check test
+terraform-check:
+	terraform -chdir=infra/terraform fmt -check -recursive
+	terraform -chdir=infra/terraform validate
+	terraform -chdir=infra/terraform test
+
+verify: lint format-check test terraform-check
