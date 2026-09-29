@@ -13,6 +13,14 @@ uv run uvicorn app.main:app --reload
 
 검증은 `make verify`로 실행합니다.
 
+## 컨테이너
+
+```bash
+bash tests/container/test_container.sh
+```
+
+이미지는 잠긴 runtime 의존성만 설치하며 UID 10001로 실행됩니다. `/healthz` 기반 Docker health check와 포트 8000을 제공합니다.
+
 ## 현재 제한
 
 - 세션 데이터는 프로세스 메모리에만 저장됩니다.

@@ -33,3 +33,9 @@ uv run ruff format --check app tests
 환경변수 `FAULT_DELAY_MS`, `FAULT_ERROR_RATE`, `READINESS_FAIL`로 지연·오류·readiness 장애를 제어한다. 잘못된 범위는 시작 시 Pydantic 검증 오류로 거부한다. 장애는 `/sessions` 경로에만 적용하여 `/healthz`를 통한 프로세스 확인은 유지한다.
 
 Prometheus 메트릭에는 HTTP 요청 수·지연시간, 활성 세션 수, 생성·삭제 누적 수를 기록한다. 요청 경로는 실제 UUID가 아닌 `/sessions/{session_id}` 템플릿으로 기록해 시계열의 label cardinality 증가를 방지한다. 구현 전에는 `app.telemetry`가 없어 1개 수집 오류로 RED를 확인했고, 구현 후 Task 2 테스트 7개가 통과했다.
+
+## 컨테이너와 CI
+
+컨테이너 계약 테스트는 `Dockerfile is required`로 먼저 실패했다. 이미지는 Python 3.12.14 slim 기반이며 잠긴 runtime 의존성만 설치하고 UID/GID 10001로 실행하도록 정의했다. GitHub Actions는 테스트 이후 이미지 build, Trivy, Gitleaks, actionlint를 순서대로 실행한다.
+
+Docker CLI 29.8.1과 Colima 0.10.3을 설치한 뒤 컨테이너 build, UID 확인, Docker health 상태, `/healthz`, `/readyz`, `/metrics` 계약을 통과했다. Trivy 0.74.0은 image tar를 읽기 전용으로 스캔했고 Debian 및 Python 패키지에서 수정 가능한 CRITICAL 취약점 0건을 보고했다. Docker socket을 스캐너 컨테이너에 직접 제공하는 방식은 권한 위험 때문에 사용하지 않았다.
