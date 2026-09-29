@@ -1,5 +1,22 @@
 # 애플리케이션 배포
 
+## 자동 배포 흐름
+
+`main`의 `ci` workflow가 성공하면 `deploy` workflow가 그 실행의 정확한 40자리 commit SHA를 가져온다. 이후 다음 순서로 배포한다.
+
+1. 검증이 끝난 commit을 checkout한다.
+2. `ghcr.io/<owner>/<repository>/game-session-api:<git-sha>` 이미지를 build하고 GHCR에 push한다.
+3. GitHub OIDC token으로 AWS 배포 역할의 단기 자격 증명을 발급받는다.
+4. `Project=gameops-platform-lab`, `Environment=portfolio` tag가 붙은 실행 중 EC2가 정확히 하나인지 확인한다.
+5. AWS Systems Manager Run Command로 인스턴스의 `deploy_on_instance.sh`를 실행하고 완료 상태를 기다린다.
+6. 인스턴스는 같은 commit을 checkout하고 manifest의 image만 불변 SHA tag로 교체한 뒤 rollout과 smoke test를 확인한다.
+
+workflow에는 장기 AWS access key를 저장하지 않는다. GitHub repository variable `AWS_DEPLOY_ROLE_ARN`에는 Terraform output `github_deploy_role_arn` 값을 설정한다. AWS 역할의 trust policy는 이 repository의 `main` branch token만 허용하고, 역할 권한은 프로젝트 tag가 붙은 인스턴스에 SSM 명령을 실행하는 범위로 제한한다. 자세한 경계는 [GitHub OIDC](../concepts/github-oidc.md)에 정리했다.
+
+GHCR 이미지는 k3s가 별도 registry credential 없이 pull하도록 공개 package로 운영한다. 첫 image가 게시되면 GitHub Packages 설정에서 해당 container package의 visibility를 `Public`으로 바꾼다. source repository 연결과 package visibility는 서로 다른 설정이므로 둘 다 확인한다.
+
+`latest` tag는 만들지 않는다. Git commit, container image, 배포된 workload가 같은 SHA를 공유하므로 장애 시 어떤 코드가 실행 중인지 역추적할 수 있다.
+
 ## manifest 사전 검증
 
 ```bash
@@ -20,3 +37,5 @@ bash scripts/smoke_test.sh http://PUBLIC_IPV4
 ```
 
 smoke test는 health/readiness와 세션 생성·조회·삭제 전체 흐름을 확인한다. 실패하면 rollout 상태, Pod event, 이전/현재 image, application log를 보존하고 원인을 확인한다.
+
+자동 배포가 실패하면 GitHub Actions의 `Deploy through Systems Manager` 단계에 SSM stdout/stderr가 출력된다. 인스턴스의 추가 증거는 `/var/lib/gameops/evidence/`에 남는다. 자동 rollback은 하지 않으므로 증거를 먼저 확인하고 [배포 실패 runbook](../runbooks/deployment-failure.md)과 [rollback runbook](../runbooks/rollback.md)을 따른다.

@@ -21,6 +21,12 @@ bash tests/container/test_container.sh
 
 이미지는 잠긴 runtime 의존성만 설치하며 UID 10001로 실행됩니다. `/healthz` 기반 Docker health check와 포트 8000을 제공합니다.
 
+## 자동 배포
+
+`main` CI가 성공하면 검증된 commit SHA로 GHCR image를 만들고, GitHub OIDC로 받은 단기 AWS 자격 증명과 Systems Manager를 사용해 EC2 k3s에 배포합니다. SSH와 장기 AWS access key는 사용하지 않습니다. 배포된 image에는 `latest` 대신 전체 Git SHA가 붙으며 rollout과 API smoke test가 모두 성공해야 workflow가 완료됩니다.
+
+환경 준비와 상세 흐름은 [배포 가이드](docs/guides/deploy.md), 장애 조사는 [배포 실패 runbook](docs/runbooks/deployment-failure.md), 운영자 rollback은 [rollback runbook](docs/runbooks/rollback.md)을 참고하십시오.
+
 ## 현재 제한
 
 - 세션 데이터는 프로세스 메모리에만 저장됩니다.
