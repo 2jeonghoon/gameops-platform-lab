@@ -1,4 +1,4 @@
-.PHONY: test lint format-check terraform-check verify
+.PHONY: test lint format-check terraform-check kubernetes-check verify
 
 test:
 	uv run pytest
@@ -14,4 +14,8 @@ terraform-check:
 	terraform -chdir=infra/terraform validate
 	terraform -chdir=infra/terraform test
 
-verify: lint format-check test terraform-check
+kubernetes-check:
+	kubectl kustomize k8s/base | kubeconform -strict -summary -ignore-missing-schemas
+	uv run pytest tests/kubernetes -v
+
+verify: lint format-check test terraform-check kubernetes-check

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-session-api
+  namespace: gameops
+  labels:
+    app.kubernetes.io/name: game-session-api
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: game-session-api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

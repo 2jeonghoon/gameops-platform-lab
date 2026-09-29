@@ -16,6 +16,8 @@
 | AWS provider | 6.62.0 | `infra/terraform/.terraform.lock.hcl` |
 | k3s / Kubernetes | v1.37.0+k3s1 / v1.37.0 | EC2 bootstrap |
 | Helm | v4.3.0 | 관측 stack 설치 |
+| kubectl / Kustomize | 1.37.0 / 5.8.1 | manifest 렌더링 |
+| kubeconform | 0.8.0 | Kubernetes schema 검증 |
 | actions/checkout | 7.0.1 / `3d3c42e5aac5ba805825da76410c181273ba90b1` | CI |
 | actions/setup-python | 7.0.0 / `5fda3b95a4ea91299a34e894583c3862153e4b97` | CI |
 | hashicorp/setup-terraform | 4.0.1 / `dfe3c3f87815947d99a8997f908cb6525fc44e9e` | CI |

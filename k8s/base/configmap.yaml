@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-session-api
+  namespace: gameops
+data:
+  FAULT_DELAY_MS: "0"
+  FAULT_ERROR_RATE: "0"
+  READINESS_FAIL: "false"
