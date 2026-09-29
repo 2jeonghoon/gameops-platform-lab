@@ -73,6 +73,11 @@ jobs:
       - name: Test rendered manifest policies
         run: uv run pytest tests/kubernetes -v
 
+      - name: Validate monitoring configuration and scripts
+        run: |
+          uv run pytest tests/monitoring -v
+          shellcheck scripts/install_observability.sh scripts/deploy_on_instance.sh scripts/rollback.sh
+
       - name: Validate Kubernetes schemas
         run: >-
           kubectl kustomize k8s/base |

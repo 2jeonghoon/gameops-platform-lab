@@ -1,0 +1,64 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {
+      "title": "Requests / second",
+      "type": "timeseries",
+      "targets": [{"expr": "sum(rate(gameops_http_requests_total[5m]))", "legendFormat": "all"}]
+    },
+    {
+      "title": "5xx ratio",
+      "type": "timeseries",
+      "targets": [{"expr": "sum(rate(gameops_http_requests_total{status_class=\"5xx\"}[5m])) / clamp_min(sum(rate(gameops_http_requests_total[5m])), 0.001)", "legendFormat": "5xx"}]
+    },
+    {
+      "title": "Latency quantiles",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "histogram_quantile(0.50, sum by (le) (rate(gameops_http_request_duration_seconds_bucket[5m])))", "legendFormat": "p50"},
+        {"expr": "histogram_quantile(0.95, sum by (le) (rate(gameops_http_request_duration_seconds_bucket[5m])))", "legendFormat": "p95"},
+        {"expr": "histogram_quantile(0.99, sum by (le) (rate(gameops_http_request_duration_seconds_bucket[5m])))", "legendFormat": "p99"}
+      ]
+    },
+    {
+      "title": "Pod readiness and restarts",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "kube_pod_status_ready{namespace=\"gameops\",condition=\"true\"}", "legendFormat": "ready {{pod}}"},
+        {"expr": "kube_pod_container_status_restarts_total{namespace=\"gameops\",container=\"api\"}", "legendFormat": "restarts {{pod}}"}
+      ]
+    },
+    {
+      "title": "Pod CPU",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"gameops\",container=\"api\"}[5m]))", "legendFormat": "{{pod}}"}]
+    },
+    {
+      "title": "Pod memory",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"gameops\",container=\"api\"})", "legendFormat": "{{pod}}"}]
+    },
+    {
+      "title": "Active sessions",
+      "type": "timeseries",
+      "targets": [{"expr": "sum(gameops_active_sessions)", "legendFormat": "active"}]
+    },
+    {
+      "title": "Session lifecycle",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "sum(rate(gameops_sessions_created_total[5m]))", "legendFormat": "created/s"},
+        {"expr": "sum(rate(gameops_sessions_deleted_total[5m]))", "legendFormat": "deleted/s"}
+      ]
+    }
+  ],
+  "refresh": "15s",
+  "schemaVersion": 41,
+  "tags": ["gameops", "portfolio"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
+  "title": "Game Session API",
+  "uid": "game-session-api",
+  "version": 1
+}

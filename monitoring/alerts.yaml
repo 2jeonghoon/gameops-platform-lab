@@ -1,0 +1,48 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: game-session-api
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/part-of: gameops-platform-lab
+spec:
+  groups:
+    - name: game-session-api
+      rules:
+        - alert: GameSessionApiHighErrorRate
+          expr: |
+            sum(rate(gameops_http_requests_total{status_class="5xx"}[2m]))
+            /
+            clamp_min(sum(rate(gameops_http_requests_total[2m])), 0.001)
+            > 0.05
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: Game session API 5xx rate exceeds 5%
+        - alert: GameSessionApiHighLatency
+          expr: |
+            histogram_quantile(0.95,
+              sum by (le) (rate(gameops_http_request_duration_seconds_bucket[5m]))
+            ) > 0.25
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Game session API p95 latency exceeds 250 ms
+        - alert: GameSessionApiTargetDown
+          expr: up{service="game-session-api"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prometheus cannot scrape the game session API
+        - alert: GameSessionApiPodRestarted
+          expr: |
+            increase(kube_pod_container_status_restarts_total{
+              namespace="gameops", container="api"
+            }[10m]) > 0
+          labels:
+            severity: warning
+          annotations:
+            summary: A game session API container restarted
