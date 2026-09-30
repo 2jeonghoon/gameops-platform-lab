@@ -28,3 +28,9 @@ uv run pytest tests/scripts/test_deploy_workflow.py -v
 ```
 
 정적 검사는 shell quoting·오류 처리를 확인했고, workflow 계약 테스트는 CI 성공 gate, OIDC permission, 정확한 SHA 전달, SSM waiter, 장기 AWS key 부재를 확인했다.
+
+## Live result — 2026-09-30
+
+실제 GitHub repository를 만든 뒤 immutable repository ID를 OIDC subject에 반영했다. AWS-managed SSM document와 project-tagged EC2 권한을 분리했고, `/bin/sh` 대신 Bash 실행, executable bit, stale clone, Kustomize mixed stream, checkout 순서 문제를 실패 로그로 진단해 수정했다.
+
+최종 CI와 deploy가 성공했고 외부 smoke lifecycle은 12/12 통과했다. Traefik이 기본적으로 Pod IP로 직접 분산해 Service affinity를 우회한다는 사실을 확인해 NativeLB를 활성화했다. 배포 직후의 일시적 502에는 idempotent health/readiness GET만 제한 재시도하도록 보완했다.

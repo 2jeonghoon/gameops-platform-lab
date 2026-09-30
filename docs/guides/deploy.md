@@ -24,7 +24,7 @@ kubectl kustomize k8s/base | kubeconform -strict -summary -ignore-missing-schema
 uv run pytest tests/kubernetes -v
 ```
 
-Deployment는 API Pod 두 개, `maxUnavailable: 0`, `maxSurge: 1`, startup/liveness/readiness probe, CPU·memory request/limit을 정의한다. Service는 ClusterIP이며 Traefik Ingress만 `/`를 외부 TCP 80에 연결한다.
+Deployment는 API Pod 두 개, `maxUnavailable: 0`, `maxSurge: 1`, startup/liveness/readiness probe, CPU·memory request/limit을 정의한다. Service는 ClusterIP이며 Traefik Ingress만 `/`를 외부 TCP 80에 연결한다. Traefik NativeLB와 Service ClientIP affinity는 메모리 기반 session lifecycle을 같은 Pod에 유지하지만, 영구 상태 저장을 대신하지 않는다.
 
 repository의 image는 `REPLACE_WITH_GIT_SHA` placeholder다. 수동으로 `latest`를 적용하지 않는다. CD workflow가 검증된 commit SHA image로 교체해야 한다.
 
@@ -36,6 +36,8 @@ kubectl -n gameops get pods,service,ingress
 bash scripts/smoke_test.sh http://PUBLIC_IPV4
 ```
 
-smoke test는 health/readiness와 세션 생성·조회·삭제 전체 흐름을 확인한다. 실패하면 rollout 상태, Pod event, 이전/현재 image, application log를 보존하고 원인을 확인한다.
+smoke test는 health/readiness와 세션 생성·조회·삭제 전체 흐름을 확인한다. rollout 직후 Traefik upstream 반영이 늦을 수 있어 health/readiness GET만 최대 30초 폴링한다. 중복 상태를 만들 수 있는 POST는 재시도하지 않는다. 실패하면 rollout 상태, Pod event, 이전/현재 image, application log를 보존하고 원인을 확인한다.
+
+2026-09-30 검증된 배포는 [CI 실행](https://github.com/2jeonghoon/gameops-platform-lab/actions/runs/36680483754)과 [deploy 실행](https://github.com/2jeonghoon/gameops-platform-lab/actions/runs/36680649002)에서 확인할 수 있다.
 
 자동 배포가 실패하면 GitHub Actions의 `Deploy through Systems Manager` 단계에 SSM stdout/stderr가 출력된다. 인스턴스의 추가 증거는 `/var/lib/gameops/evidence/`에 남는다. 자동 rollback은 하지 않으므로 증거를 먼저 확인하고 [배포 실패 runbook](../runbooks/deployment-failure.md)과 [rollback runbook](../runbooks/rollback.md)을 따른다.

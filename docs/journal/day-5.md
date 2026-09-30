@@ -26,3 +26,9 @@ helm template monitoring prometheus-community/kube-prometheus-stack --version 91
 helm template loki grafana-community/loki --version 18.13.7 -f monitoring/loki-values.yaml
 helm template alloy grafana/alloy --version 1.13.0 -f monitoring/alloy-values.yaml
 ```
+
+## Live result — 2026-09-30
+
+Helm은 SSM 비대화형 shell에서 kubeconfig를 자동으로 찾지 못해 `KUBECONFIG=/etc/rancher/k3s/k3s.yaml`을 명시했다. ServiceMonitor 생성 직후 target discovery가 비동기적으로 늦어질 수 있어 API endpoint 두 개가 모두 `up`일 때까지 제한 폴링하도록 수정했다.
+
+Prometheus target 2개, Grafana datasource와 8개 dashboard panel, Alertmanager, monitoring Pod 6개 Ready를 확인했다. Loki/Alloy는 설치 시 가용 메모리가 약 1.07GiB로 안전 기준 1.5GiB 미만이라 생략했고 Kubernetes logs를 fallback으로 선택했다.

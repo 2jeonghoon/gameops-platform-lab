@@ -49,7 +49,7 @@ def test_fault_injection_rejects_invalid_values_before_kubectl(tmp_path: Path) -
         assert not marker.exists()
 
 
-def test_incident_drafts_cannot_be_mistaken_for_executed_reports() -> None:
+def test_executed_incident_reports_have_evidence_and_no_draft_marker() -> None:
     required_sections = (
         "Hypothesis",
         "Preconditions and workload",
@@ -68,6 +68,8 @@ def test_incident_drafts_cannot_be_mistaken_for_executed_reports() -> None:
         "003-load-degradation.md",
     ):
         source = (Path("docs/incidents") / name).read_text()
-        assert "NOT YET EXECUTED" in source
+        assert "NOT YET EXECUTED" not in source
+        assert "2026-09-30" in source
+        assert "HTTP 요청:" in source
         for section in required_sections:
             assert f"## {section}" in source

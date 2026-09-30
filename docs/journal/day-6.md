@@ -16,3 +16,12 @@ fault script는 음수 delay, 0..1 밖 error rate, boolean이 아닌 readiness �
 Incident 문서는 아직 실행하지 않은 계획을 완료 보고서처럼 보이게 하지 않도록 `NOT YET EXECUTED` 표시를 넣었다. Task 10에서 실제 UTC timeline, metric, log, event, alert, k6 결과를 얻은 경우에만 이를 교체한다.
 
 열화 부하는 threshold 위반으로 k6가 non-zero 종료하는 것이 예상된 증거다. 이 결과를 CI 실패와 혼동하지 않도록 CI에서는 실행하지 않고 syntax와 archive 생성만 검증한다.
+
+## Live result — 2026-09-30
+
+- 정상 기준선: 18,939 requests, 실패 0%, p95 15.84ms
+- Pod 종료: replacement Ready 7.101초, 19,065 requests, 실패 0%, p95 16.00ms
+- invalid image: `ImagePullBackOff`, 기존 Ready 2 유지, rollback 약 0.84초, 19,032 requests 중 실패 0%
+- degradation: 93,737 requests, 실패 9.88%, p95 400.94ms, 160 dropped iterations, 최대 150 VU
+
+Degradation에서 error와 latency alert가 pending에서 firing으로 전이했고 fault 복원 뒤 모두 inactive가 됐다. 세 실험의 timeline, event, response, recovery, 한계는 `docs/incidents/`에 기록했다.

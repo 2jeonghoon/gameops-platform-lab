@@ -5,3 +5,7 @@ cloud-init은 `git`, `curl`, SSM agent를 준비하고 k3s `v1.37.0+k3s1`, Helm 
 구현 전 Terraform 테스트 2개는 리소스 미정의로 실패했고 cloud-init 검사는 template 부재로 실패했다. 구현 후 network·compute·IAM mock test 3개와 cloud-init 계약이 통과했다. 아직 실제 EC2를 만들지 않았으므로 cloud-init 실행 성공은 라이브 단계에서 SSM으로 확인해야 한다.
 
 Kubernetes manifest 정책 테스트는 `k8s/base` 부재로 먼저 2개가 실패했다. 구현 후 정책 테스트 2개와 kubeconform schema 검증에서 5개 resource가 모두 유효했다. 로컬 컨테이너에 `smoke_test.sh`를 실행해 health, readiness, 세션 생성·조회·삭제가 통과하는 것도 확인했다.
+
+## Live result — 2026-09-30
+
+Terraform apply 뒤 SSM으로 cloud-init `done`, SSM Agent `active`, k3s `active`, node `Ready`, Kubernetes `/readyz` 성공을 확인했다. 공개 Security Group은 TCP 80만 허용했고 22와 6443은 열지 않았다. 인스턴스 식별자와 공인 주소는 raw evidence에만 두고 문서에서는 제거했다.

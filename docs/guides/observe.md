@@ -62,3 +62,13 @@ Loki가 생략되었거나 불건전하면 Kubernetes log를 사용한다.
 ```bash
 sudo k3s kubectl -n gameops logs deployment/game-session-api --all-pods=true --since=15m
 ```
+
+## 2026-09-30 실행 결과
+
+- Prometheus에서 `game-session-api` endpoint 2개 모두 `up`
+- Grafana datasource health 통과, `Game Session API` dashboard 8개 panel 로드
+- Alertmanager 포함 monitoring Pod 6개 모두 Ready
+- Loki/Alloy는 `MemAvailable` 약 1.07GiB로 1.5GiB gate보다 낮아 생략
+- degradation 실험에서 error·latency alert가 pending → firing → inactive로 전이
+
+경보와 대시보드에는 외부 ingress를 만들지 않았다. 모든 확인은 SSM과 EC2 loopback port-forward를 통해 수행했다.
