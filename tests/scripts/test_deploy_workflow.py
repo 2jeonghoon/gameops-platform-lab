@@ -16,6 +16,7 @@ def test_deploy_workflow_is_gated_and_uses_short_lived_identity() -> None:
     assert "github.event.workflow_run.head_sha" in source
     assert "game-session-api:${DEPLOY_SHA}" in source
     assert "aws ssm wait command-executed" in source
+    assert 'remote_command="bash -lc' in source
     assert "AWS_ACCESS_KEY_ID" not in source
     assert "AWS_SECRET_ACCESS_KEY" not in source
 

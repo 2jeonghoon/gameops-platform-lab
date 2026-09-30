@@ -75,7 +75,8 @@ jobs:
         shell: bash
         run: |
           repo_url="https://github.com/${GITHUB_REPOSITORY}.git"
-          remote_command="set -euo pipefail; install -d -m 0755 /opt/gameops; if [[ ! -d /opt/gameops/repository/.git ]]; then git clone '${repo_url}' /opt/gameops/repository; fi; /opt/gameops/repository/scripts/deploy_on_instance.sh '${repo_url}' '${DEPLOY_SHA}' '${IMAGE_REF}'"
+          remote_script="set -euo pipefail; install -d -m 0755 /opt/gameops; if [[ ! -d /opt/gameops/repository/.git ]]; then git clone '${repo_url}' /opt/gameops/repository; fi; /opt/gameops/repository/scripts/deploy_on_instance.sh '${repo_url}' '${DEPLOY_SHA}' '${IMAGE_REF}'"
+          remote_command="bash -lc $(printf '%q' "${remote_script}")"
           jq -n --arg command "${remote_command}" '{commands: [$command]}' >ssm-parameters.json
           command_id="$(aws ssm send-command \
             --instance-ids "${INSTANCE_ID}" \
