@@ -13,7 +13,7 @@
 
 fault script는 음수 delay, 0..1 밖 error rate, boolean이 아닌 readiness 값을 `kubectl` 호출 전에 거절한다. 변경 뒤 Deployment를 restart하고 rollout을 기다려 설정 적용 완료를 명시적으로 확인한다.
 
-Incident 문서는 아직 실행하지 않은 계획을 완료 보고서처럼 보이게 하지 않도록 `NOT YET EXECUTED` 표시를 넣었다. Task 10에서 실제 UTC timeline, metric, log, event, alert, k6 결과를 얻은 경우에만 이를 교체한다.
+Incident 문서는 실행 전에는 초안 표시를 두어 계획이 완료 보고서로 오인되지 않게 했다. 라이브 실험 뒤 실제 UTC timeline, metric, log, event, alert, k6 결과로 모두 교체했다.
 
 열화 부하는 threshold 위반으로 k6가 non-zero 종료하는 것이 예상된 증거다. 이 결과를 CI 실패와 혼동하지 않도록 CI에서는 실행하지 않고 syntax와 archive 생성만 검증한다.
 

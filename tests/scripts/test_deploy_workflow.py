@@ -15,6 +15,7 @@ def test_deploy_workflow_is_gated_and_uses_short_lived_identity() -> None:
     assert workflow["on"]["workflow_run"]["branches"] == ["main"]
     assert workflow["permissions"]["id-token"] == "write"
     assert "github.event.workflow_run.conclusion == 'success'" in workflow["jobs"]["deploy"]["if"]
+    assert "vars.AWS_ENVIRONMENT_ACTIVE == 'true'" in workflow["jobs"]["deploy"]["if"]
     assert "github.event.workflow_run.head_sha" in source
     assert "game-session-api:${DEPLOY_SHA}" in source
     assert "aws ssm wait command-executed" in source

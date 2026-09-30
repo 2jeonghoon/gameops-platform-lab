@@ -19,6 +19,7 @@
 | SSH·Kubernetes API 비공개 | Security Group plan과 [security 문서](security.md) | 공개 ingress는 TCP 80만 허용 |
 | k3s bootstrap | SSM에서 cloud-init, systemd, node, `/readyz` 조회 | cloud-init done, k3s active, node Ready |
 | 비밀 없는 배포 | GitHub OIDC trust와 SSM IAM policy tests | 장기 AWS key와 SSH key 없음 |
+| 비용 안전 종료 | [teardown guide](guides/teardown.md), tag inventory, Terraform state | EC2 0, EBS 0, Elastic IP 0, state 0 |
 
 ## Observability
 
@@ -51,3 +52,7 @@ sudo bash scripts/inject_fault.sh 0 0 false
 ```
 
 성능 수치는 이 단일 실행 환경의 측정값이며 보편적 benchmark로 주장하지 않는다.
+
+## Teardown
+
+2026-09-30 11:08 UTC에 저장한 destroy plan의 17개 리소스를 제거했다. `scripts/verify_teardown.py`가 Project tag 기반 EC2·EBS·Elastic IP inventory와 Terraform state를 별도로 조회해 모두 0건임을 확인했다. 당일 Cost Explorer 결과는 USD 0이지만 `Estimated=true`였으므로 확정 비용으로 사용하지 않는다. 종료 절차와 재검증 명령은 [Day 7](journal/day-7.md)에 기록했다.
