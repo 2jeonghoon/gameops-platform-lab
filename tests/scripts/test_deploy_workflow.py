@@ -1,3 +1,4 @@
+import stat
 from pathlib import Path
 
 import yaml
@@ -22,8 +23,10 @@ def test_deploy_workflow_is_gated_and_uses_short_lived_identity() -> None:
 
 
 def test_instance_deploy_waits_for_rollout_and_preserves_failure_evidence() -> None:
-    source = Path("scripts/deploy_on_instance.sh").read_text()
+    path = Path("scripts/deploy_on_instance.sh")
+    source = path.read_text()
 
+    assert path.stat().st_mode & stat.S_IXUSR
     assert "git checkout --detach" in source
     assert "kubectl set image --local" in source
     assert "rollout status" in source
