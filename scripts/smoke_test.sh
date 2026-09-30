@@ -21,10 +21,26 @@ expect_status() {
   fi
 }
 
-expect_status 200 "${base_url}/healthz"
+wait_for_status() {
+  local expected="$1"
+  local url="$2"
+  local actual="000"
+  local attempt
+  for ((attempt = 1; attempt <= 15; attempt++)); do
+    actual="$(curl --silent --output "${body}" --write-out '%{http_code}' "${url}" || true)"
+    if [[ "${actual}" == "${expected}" ]]; then
+      return 0
+    fi
+    sleep 2
+  done
+  echo "expected HTTP ${expected}, got ${actual}: $(<"${body}")" >&2
+  exit 1
+}
+
+wait_for_status 200 "${base_url}/healthz"
 grep --quiet '"status":"ok"' "${body}"
 
-expect_status 200 "${base_url}/readyz"
+wait_for_status 200 "${base_url}/readyz"
 grep --quiet '"status":"ready"' "${body}"
 
 expect_status 201 \

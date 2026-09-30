@@ -59,3 +59,11 @@ def test_manifest_renderer_preserves_resources_and_pins_verified_image() -> None
     }
     deployment = next(item for item in resources if item["kind"] == "Deployment")
     assert deployment["spec"]["template"]["spec"]["containers"][0]["image"] == image_ref
+
+
+def test_smoke_test_waits_only_for_safe_readiness_requests() -> None:
+    source = Path("scripts/smoke_test.sh").read_text()
+
+    assert 'wait_for_status 200 "${base_url}/healthz"' in source
+    assert 'wait_for_status 200 "${base_url}/readyz"' in source
+    assert source.index("wait_for_status 200") < source.index("expect_status 201")
