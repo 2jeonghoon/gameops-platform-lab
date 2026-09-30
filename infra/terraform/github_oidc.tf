@@ -37,13 +37,16 @@ resource "aws_iam_role_policy" "github_deploy" {
         Resource = "*"
       },
       {
-        Sid    = "SendProjectCommand"
-        Effect = "Allow"
-        Action = ["ssm:SendCommand"]
-        Resource = [
-          "arn:aws:ssm:${var.aws_region}:*:document/AWS-RunShellScript",
-          "arn:aws:ec2:${var.aws_region}:*:instance/*"
-        ]
+        Sid      = "UseApprovedDocument"
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
+        Resource = "arn:aws:ssm:${var.aws_region}::document/AWS-RunShellScript"
+      },
+      {
+        Sid      = "SendProjectCommand"
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
+        Resource = "arn:aws:ec2:${var.aws_region}:*:instance/*"
         Condition = {
           StringEquals = {
             "ssm:resourceTag/Project" = var.project_name

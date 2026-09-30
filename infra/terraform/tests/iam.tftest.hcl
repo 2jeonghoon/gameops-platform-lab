@@ -38,4 +38,24 @@ run "github_oidc_and_least_privilege" {
     condition     = strcontains(aws_iam_role_policy.github_deploy.policy, "AWS-RunShellScript") && strcontains(aws_iam_role_policy.github_deploy.policy, "ssm:resourceTag/Project")
     error_message = "SendCommand must be limited to AWS-RunShellScript and project-tagged instances."
   }
+
+  assert {
+    condition = length([
+      for statement in jsondecode(aws_iam_role_policy.github_deploy.policy).Statement : statement
+      if statement.Sid == "UseApprovedDocument" &&
+      statement.Resource == "arn:aws:ssm:ap-northeast-2::document/AWS-RunShellScript" &&
+      !can(statement.Condition)
+    ]) == 1
+    error_message = "The AWS-managed SSM document must use its accountless ARN without a resource-tag condition."
+  }
+
+  assert {
+    condition = length([
+      for statement in jsondecode(aws_iam_role_policy.github_deploy.policy).Statement : statement
+      if statement.Sid == "SendProjectCommand" &&
+      statement.Resource == "arn:aws:ec2:ap-northeast-2:*:instance/*" &&
+      statement.Condition.StringEquals["ssm:resourceTag/Project"] == "gameops-platform-lab"
+    ]) == 1
+    error_message = "SendCommand target access must remain limited to project-tagged instances."
+  }
 }
