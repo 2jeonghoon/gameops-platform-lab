@@ -4,9 +4,11 @@ run "github_oidc_and_least_privilege" {
   command = apply
 
   variables {
-    budget_alert_email = "operator@example.com"
-    github_owner       = "example-owner"
-    github_repository  = "gameops-platform-lab"
+    budget_alert_email   = "operator@example.com"
+    github_owner         = "example-owner"
+    github_owner_id      = "12345678"
+    github_repository    = "gameops-platform-lab"
+    github_repository_id = "987654321"
   }
 
   assert {
@@ -15,8 +17,8 @@ run "github_oidc_and_least_privilege" {
   }
 
   assert {
-    condition     = strcontains(aws_iam_role.github_deploy.assume_role_policy, "repo:example-owner/gameops-platform-lab:ref:refs/heads/main")
-    error_message = "Only the exact repository main branch may assume the deploy role."
+    condition     = strcontains(aws_iam_role.github_deploy.assume_role_policy, "repo:example-owner@12345678/gameops-platform-lab@987654321:ref:refs/heads/main")
+    error_message = "Only the immutable repository identity on main may assume the deploy role."
   }
 
   assert {

@@ -4,9 +4,11 @@ run "network_and_cost_guardrails" {
   command = apply
 
   variables {
-    budget_alert_email = "operator@example.com"
-    github_owner       = "example-owner"
-    github_repository  = "gameops-platform-lab"
+    budget_alert_email   = "operator@example.com"
+    github_owner         = "example-owner"
+    github_owner_id      = "12345678"
+    github_repository    = "gameops-platform-lab"
+    github_repository_id = "987654321"
   }
 
   assert {
