@@ -1,4 +1,5 @@
 import stat
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -29,8 +30,31 @@ def test_instance_deploy_waits_for_rollout_and_preserves_failure_evidence() -> N
 
     assert path.stat().st_mode & stat.S_IXUSR
     assert "git checkout --detach" in source
-    assert "kubectl set image --local" in source
+    assert "scripts/render_manifests.sh" in source
     assert "rollout status" in source
     assert "/var/lib/gameops/evidence" in source
     assert "no automatic rollback performed" in source
     assert "scripts/smoke_test.sh" in source
+
+
+def test_manifest_renderer_preserves_resources_and_pins_verified_image() -> None:
+    image_ref = "ghcr.io/example/game-session-api:" + "a" * 40
+
+    result = subprocess.run(
+        ["bash", "scripts/render_manifests.sh", image_ref],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    resources = [item for item in yaml.safe_load_all(result.stdout) if item]
+    assert {item["kind"] for item in resources} == {
+        "ConfigMap",
+        "Deployment",
+        "Ingress",
+        "Namespace",
+        "Service",
+    }
+    deployment = next(item for item in resources if item["kind"] == "Deployment")
+    assert deployment["spec"]["template"]["spec"]["containers"][0]["image"] == image_ref

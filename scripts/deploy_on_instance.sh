@@ -32,9 +32,7 @@ install -d -m 0755 "${evidence_dir}"
 previous_image="$(k3s kubectl -n "${namespace}" get deployment "${deployment}" -o jsonpath='{.spec.template.spec.containers[?(@.name=="api")].image}' 2>/dev/null || true)"
 printf '%s\n' "${previous_image}" >"${evidence_dir}/previous-image"
 
-k3s kubectl kustomize k8s/base \
-  | k3s kubectl set image --local -f - "deployment/${deployment}" "api=${image_ref}" -o yaml \
-  | k3s kubectl apply -f -
+bash scripts/render_manifests.sh "${image_ref}" | k3s kubectl apply -f -
 
 if ! k3s kubectl -n "${namespace}" rollout status "deployment/${deployment}" --timeout=180s; then
   evidence_file="${evidence_dir}/rollout-${commit_sha}-$(date -u +%Y%m%dT%H%M%SZ).log"

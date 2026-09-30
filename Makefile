@@ -21,7 +21,7 @@ kubernetes-check:
 
 monitoring-check:
 	uv run pytest tests/monitoring -v
-	shellcheck scripts/install_observability.sh scripts/deploy_on_instance.sh scripts/rollback.sh
+	shellcheck scripts/install_observability.sh scripts/deploy_on_instance.sh scripts/render_manifests.sh scripts/rollback.sh
 
 loadtest-check:
 	uv run pytest tests/loadtest -v
