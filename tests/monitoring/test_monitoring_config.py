@@ -125,6 +125,7 @@ def test_install_script_pins_charts_checks_health_and_gates_loki() -> None:
     assert 'export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"' in source
     assert "MemAvailable" in source
     assert "api/v1/targets" in source
+    assert "wait_for_prometheus_target" in source
     assert "api/datasources/uid/prometheus/health" in source
     assert "admin-password" in source
     assert "Loki installed" in source

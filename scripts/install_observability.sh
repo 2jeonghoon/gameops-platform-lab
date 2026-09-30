@@ -38,6 +38,32 @@ wait_for_url() {
   return 1
 }
 
+wait_for_prometheus_target() {
+  local attempts="${1:-60}"
+  local attempt
+  local targets_json
+  for ((attempt = 1; attempt <= attempts; attempt++)); do
+    targets_json="$(curl --fail --silent --show-error \
+      http://127.0.0.1:19090/api/v1/targets 2>/dev/null || true)"
+    if python3 -c '
+import json
+import sys
+
+try:
+    targets = json.load(sys.stdin)["data"]["activeTargets"]
+except (KeyError, json.JSONDecodeError):
+    raise SystemExit(1)
+selected = [target for target in targets if target.get("labels", {}).get("service") == "game-session-api"]
+raise SystemExit(0 if len(selected) == 2 and all(target.get("health") == "up" for target in selected) else 1)
+' <<<"${targets_json}"; then
+      return 0
+    fi
+    sleep 2
+  done
+  echo "timed out waiting for two healthy game-session-api Prometheus targets" >&2
+  return 1
+}
+
 kubectl create namespace "${MONITORING_NAMESPACE}" --dry-run=client -o yaml \
   | kubectl apply -f -
 
@@ -68,16 +94,7 @@ kubectl -n "${MONITORING_NAMESPACE}" port-forward \
   >/tmp/gameops-prometheus-port-forward.log 2>&1 &
 port_forward_pid=$!
 wait_for_url http://127.0.0.1:19090/-/ready
-targets_json="$(curl --fail --silent --show-error http://127.0.0.1:19090/api/v1/targets)"
-python3 -c '
-import json
-import sys
-
-targets = json.load(sys.stdin)["data"]["activeTargets"]
-selected = [target for target in targets if target.get("labels", {}).get("service") == "game-session-api"]
-if not selected or any(target.get("health") != "up" for target in selected):
-    raise SystemExit("game-session-api Prometheus targets are missing or unhealthy")
-' <<<"${targets_json}"
+wait_for_prometheus_target
 stop_port_forward
 echo "Prometheus target is healthy"
 
