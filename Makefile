@@ -11,6 +11,7 @@ format-check:
 
 terraform-check:
 	terraform -chdir=infra/terraform fmt -check -recursive
+	terraform -chdir=infra/terraform init -backend=false -input=false
 	terraform -chdir=infra/terraform validate
 	terraform -chdir=infra/terraform test
 
