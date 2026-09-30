@@ -94,7 +94,7 @@ kubectl -n "${MONITORING_NAMESPACE}" port-forward \
   >/tmp/gameops-prometheus-port-forward.log 2>&1 &
 port_forward_pid=$!
 wait_for_url http://127.0.0.1:19090/-/ready
-wait_for_prometheus_target
+wait_for_prometheus_target 60
 stop_port_forward
 echo "Prometheus target is healthy"
 
