@@ -122,6 +122,7 @@ def test_install_script_pins_charts_checks_health_and_gates_loki() -> None:
     assert 'KUBE_PROMETHEUS_STACK_VERSION="91.8.0"' in source
     assert 'LOKI_VERSION="18.13.7"' in source
     assert 'ALLOY_VERSION="1.13.0"' in source
+    assert 'export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"' in source
     assert "MemAvailable" in source
     assert "api/v1/targets" in source
     assert "api/datasources/uid/prometheus/health" in source

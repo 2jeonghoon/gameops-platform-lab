@@ -6,6 +6,7 @@ LOKI_VERSION="18.13.7"
 ALLOY_VERSION="1.13.0"
 MONITORING_NAMESPACE="monitoring"
 LOKI_MIN_AVAILABLE_KIB=1572864
+export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 port_forward_pid=""
