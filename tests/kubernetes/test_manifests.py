@@ -44,6 +44,8 @@ def test_service_ingress_and_fault_defaults_are_private_and_bounded() -> None:
     config = resources[("ConfigMap", "game-session-api")]
 
     assert service["spec"]["type"] == "ClusterIP"
+    assert service["spec"]["sessionAffinity"] == "ClientIP"
+    assert service["spec"]["sessionAffinityConfig"] == {"clientIP": {"timeoutSeconds": 10800}}
     assert service["spec"]["ports"] == [{"name": "http", "port": 8000, "targetPort": "http"}]
     assert ingress["spec"]["rules"][0]["http"]["paths"][0]["path"] == "/"
     assert config["data"] == {

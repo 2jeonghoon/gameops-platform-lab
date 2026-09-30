@@ -7,6 +7,10 @@ metadata:
     app.kubernetes.io/name: game-session-api
 spec:
   type: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
   selector:
     app.kubernetes.io/name: game-session-api
   ports:
