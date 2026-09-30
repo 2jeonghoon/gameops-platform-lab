@@ -16,7 +16,7 @@ terraform-check:
 	terraform -chdir=infra/terraform test
 
 kubernetes-check:
-	kubectl kustomize k8s/base | kubeconform -strict -summary -ignore-missing-schemas
+	kubectl kustomize k8s/base | docker run --rm --interactive ghcr.io/yannh/kubeconform:v0.8.0 -strict -summary -ignore-missing-schemas
 	uv run pytest tests/kubernetes -v
 
 monitoring-check:
