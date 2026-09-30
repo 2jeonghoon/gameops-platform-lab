@@ -19,6 +19,7 @@ def test_deploy_workflow_is_gated_and_uses_short_lived_identity() -> None:
     assert "game-session-api:${DEPLOY_SHA}" in source
     assert "aws ssm wait command-executed" in source
     assert 'remote_command="bash -lc' in source
+    assert "git -C /opt/gameops/repository checkout --detach '${DEPLOY_SHA}'" in source
     assert "bash /opt/gameops/repository/scripts/deploy_on_instance.sh" in source
     assert "AWS_ACCESS_KEY_ID" not in source
     assert "AWS_SECRET_ACCESS_KEY" not in source
